@@ -22,3 +22,11 @@ sslServer.listen(port, () => {
 app.get('/', (request, response) => {
     response.render('index');
 });
+
+app.get('/game', (request, response) => {
+    response.render('game');
+})
+
+app.get('/sensors', (request, response) => {
+    response.send('sensor');
+});
