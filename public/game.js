@@ -10,9 +10,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 const canvas = renderer.domElement;
 document.body.appendChild(renderer.domElement);
 
-const ui = document.createElement('div');
-ui.classList.add('ui');
-document.body.appendChild(ui);
+//const ui = document.querySelector('.ui');
+//document.body.appendChild(ui);
 
 const gameobject = new GameObject(scene);
 
