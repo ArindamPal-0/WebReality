@@ -49,6 +49,7 @@ renderer.setClearColor(0x000000, .1);
 document.body.appendChild(renderer.domElement);
 
 const div = document.createElement('div');
+div.classList.add('loading');
 div.textContent = "Loading...";
 document.body.appendChild(div);
 
