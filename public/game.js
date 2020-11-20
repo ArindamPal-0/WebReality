@@ -7,6 +7,10 @@ const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 renderer.setClearColor('#efefef', .1);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+
 const canvas = renderer.domElement;
 document.body.appendChild(renderer.domElement);
 
@@ -39,14 +43,7 @@ const loop = () => {
             restartButton.style.display = 'block';
         }
 
-        if(gameobject.player){
-            gameobject.removePlayer(scene);
-        }
-
-        gameobject.enemies.forEach(enemy => {
-            enemy.remove(scene);
-        });
-        gameobject.enemies.splice(0, gameobject.enemies.length);
+        gameobject.clearScene(scene);
 
         if(intervalId){
             clearInterval(intervalId);

@@ -2,14 +2,21 @@ const icosahedronGeometry = new THREE.IcosahedronGeometry();
 const coneGeometry = new THREE.ConeGeometry();
 const boxGeometry = new THREE.BoxGeometry();
 
-const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-const material2 = new THREE.MeshBasicMaterial({color: 0xff0101});
+const material = new THREE.MeshStandardMaterial({color: 0x00ff00});
+const material2 = new THREE.MeshStandardMaterial({color: 0xff0101});
 const lineMaterial = new THREE.LineBasicMaterial({color: 0x0000ff});
+const material3 = new THREE.MeshStandardMaterial({
+    color: 0xFF0000,
+    opacity: 0.8,
+    transparent: true,
+});
 
 class Player{
     constructor(scene){
         this.mesh = new THREE.Mesh(boxGeometry, material);
         this.mesh.geometry.computeBoundingBox();
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
         this.box = new THREE.Box3().setFromObject(this.mesh);
         this.b = new THREE.BoxHelper(this.mesh, 0x00aa00);
         scene.add(this.mesh);
@@ -51,8 +58,10 @@ class Player{
 class Enemy{
     constructor(scene, number, lane = 0){
         this.number = number;
-        this.mesh = new THREE.Mesh(boxGeometry, material2);
+        this.mesh = new THREE.Mesh(boxGeometry, material3);
         this.mesh.geometry.computeBoundingBox();
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
         this.box = new THREE.Box3().setFromObject(this.mesh);
         this.b = new THREE.BoxHelper(this.mesh, 0x000000);
         scene.add(this.b);
@@ -125,10 +134,79 @@ class GameObject{
     constructor(scene){
         this.gameover = false;
         this.paused = false;
-        this.player = new Player(scene);
+        this.player = this.addPlayer(scene);
         this.enemies = [];
 
+        this.ground = this.addGround(scene);
+        this.ambient = null;
+        this.light = null;
+
+        this.addLights(scene);
+
         this.addEnemy(scene, 0);
+    }
+
+    addGround(scene){
+        const planeMaterial = new THREE.MeshStandardMaterial({
+            color: 0xFFFFFF,
+            opacity: 0.8,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+        
+        const planeGeometry = new THREE.PlaneGeometry(1, 1);
+        
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotation.x = - Math.PI / 2;
+        plane.position.set(0, -0.6, -2);
+        
+        plane.scale.set(5.5, 15, 1);
+        
+        scene.add(plane);
+
+        return plane;
+    }
+
+    removeGround(scene){
+        if(this.ground){
+            scene.remove(this.ground);
+            this.ground = null;
+        }
+    }
+
+    addLights(scene){
+        this.ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+        scene.add( this.ambient );
+
+        this.light = new THREE.DirectionalLight({color: 0xFFFFFF});
+        this.light.intensity = 1.3;
+
+        this.light.castShadow = true;
+        this.light.shadow.mapSize.width = 512;
+        this.light.shadow.mapSize.height = 512;
+        this.light.shadow.camera.near = 10;
+        this.light.shadow.camera.far = 200;
+        this.light.shadowRadius = 2;
+        this.light.shadow.focus = 1;
+        this.light.shadow.mapSize.width = 2048;
+        this.light.shadow.mapSize.height = 1024;
+
+        this.light.position.set(10, 10, 7.5);
+
+        scene.add(this.light);
+    }
+
+    removeLights(scene){
+        if(this.ambient){
+            scene.remove(this.ambient);
+            this.ambient = null;
+        }
+
+        if(this.lights){
+            scene.remove(this.lights);
+            this.lights = null;
+        }
     }
 
     addEnemy(scene, lane){
@@ -222,5 +300,19 @@ class GameObject{
                 }
             }
         }
+    }
+
+    clearScene(scene){
+        if(gameobject.player){
+            gameobject.removePlayer(scene);
+        }
+
+        gameobject.enemies.forEach(enemy => {
+            enemy.remove(scene);
+        });
+        gameobject.enemies.splice(0, gameobject.enemies.length);
+
+        gameobject.removeGround();
+        gameobject.removeLights();
     }
 }
