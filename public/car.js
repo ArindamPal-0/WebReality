@@ -53,6 +53,50 @@ div.classList.add('loading');
 div.textContent = "Loading...";
 document.body.appendChild(div);
 
+//setup sensor
+let gyroSensitivity = 0.01;
+let rotX = 0;
+let rotY = 0;
+let rotationLimitX = 0.1;
+
+let gyroReading = true;
+
+let gyroscope = new Gyroscope({frequency: 60});
+
+gyroscope.onreading = () => {
+    rotY = 0;
+    rotX = 0;
+
+    rotX = Math.PI * gyroscope.x * gyroSensitivity;
+    rotY = Math.PI * gyroscope.y * gyroSensitivity;
+
+    /*
+    if(rotY < -38.8){
+        rotY = -38.8;
+    }else if(rotY > -38){
+        rotY = -38;
+    }
+    */
+
+    //p.textContent = rotY;
+
+    spherical.theta += rotY;
+    spherical.phi += rotX;
+
+    if(spherical.theta > Math.PI * 2){
+        spherical.theta = 0;
+    }
+
+    if(spherical.phi < Math.PI / 4){
+        spherical.phi = Math.PI / 4;
+    }else if(spherical.phi > Math.PI / 2){
+        spherical.phi = Math.PI / 2;
+    }
+
+    camera.position.setFromSpherical(spherical);
+    camera.lookAt(new THREE.Vector3());
+}
+
 let loader = new THREE.GLTFLoader();
 loader.load('/car.gltf', gltf => {
     car = gltf.scene.children[0];
@@ -63,6 +107,7 @@ loader.load('/car.gltf', gltf => {
     animate();
     //console.log(document.body.lastChild == div);
     div.remove();
+    gyroscope.start();
 });
 
 window.addEventListener('resize', () => {
@@ -73,15 +118,5 @@ window.addEventListener('resize', () => {
 
 const animate = () => {
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-
-    
-    spherical.theta += Math.PI / 1000;
-    if(spherical.theta > Math.PI * 2){
-        spherical.theta = 0;
-    }
-
-    camera.position.setFromSpherical(spherical);
-    camera.lookAt(new THREE.Vector3());
-    
+    requestAnimationFrame(animate);    
 }
