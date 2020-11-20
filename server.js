@@ -19,14 +19,15 @@ sslServer.listen(port, () => {
     console.log(`Server listening on https://localhost:${port}`);
 });
 
+const routes = ['game', 'car'];
+
 app.get('/', (request, response) => {
-    response.render('index');
+    const url = `${request.protocol}://${request.get('host')}`;
+    response.render('index', {url, routes});
 });
 
-app.get('/game', (request, response) => {
-    response.render('game');
-})
-
-app.get('/sensors', (request, response) => {
-    response.send('sensor');
+routes.forEach(route => {
+    app.get(`/${route}`, (request, response) => {
+        response.render(route);
+    });
 });
