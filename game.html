@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Canvas3d</title>
+    <style>
+        body{
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
+            background-color: rgba(0, 0, 0, .5);
+        }
+
+        video{
+            height: 100%;
+            z-index: 1;
+        }
+
+        canvas{
+            display: block;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 3;
+        }
+
+        .pause, .restart, .pause-camera, .pos{
+            background-color: rgba(0, 0, 0, .2);
+            color: white;
+            padding: .5rem;
+            margin: .5rem;
+            cursor: pointer;
+            border-radius: .3rem;
+            border: 1px solid white;
+        }
+
+        .restart{
+            display: none;
+        }
+
+        .ui{
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 5;
+        }        
+    </style>
+</head>
+<body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r122/three.js" integrity="sha512-iaZ8D6RzguOWQ+B5SLJCHPid3/2UaVIFnsNJHy068pv3r5G6kYOe+XufLqd6qNrQmaHeYR0iVyu2xkXB2llnMg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+
+    <script src="/public/camera.js"></script>
+    <script src="/public/gameclasses.js"></script>
+    <script src="/public/game.js"></script>
+    <script src="/public/sensorinput.js"></script>
+</body>
+</html>
