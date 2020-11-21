@@ -18,7 +18,6 @@ Try this yourself on the Github pages linked below and have fun, its not great y
 [WebReality Github pages](https://arindampal-0.github.io/WebReality)
 
 ## Using Web Reality
- ---
 
 If you want to host it on you PC and run on local network, follow steps below
 
@@ -82,11 +81,9 @@ Connect mobile to the same network as that your PC running the server and open t
 AND HAVE FUN...
 
 ## Goal
----
 
 The main goal of this project is to create Augmented and Virtual Reality Content on the Web, so feel free to help out with you ideas and code. :grin:
 
 ## Contribution
----
 
 You may request or ask questions regarding the project in the [issues](https://github.com/ArindamPal-0/WebReality/issues) page, as currently the project is only maintained by me, it may take time to respond and make required changes. Please consider forking the repository and contributing to its development. :heart:
