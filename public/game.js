@@ -65,9 +65,8 @@ restartButton.classList.add('restart');
 
 restartButton.addEventListener('click', () => {
     if(gameobject.gameover){
-        gameobject.player = new Player(scene);
+        gameobject.init(scene);
         intervalId = setInterval(loop, 1000);
-        gameobject.gameover = false;
         restartButton.style.display = 'none';
     }
 });

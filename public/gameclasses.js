@@ -146,6 +146,13 @@ class GameObject{
         this.addEnemy(scene, 0);
     }
 
+    init(scene){
+        this.player = this.addPlayer(scene);
+        this.ground = this.addGround(scene);
+        this.addLights(scene);
+        this.gameover = false;
+    }
+
     addGround(scene){
         const planeMaterial = new THREE.MeshStandardMaterial({
             color: 0xFFFFFF,
@@ -312,7 +319,7 @@ class GameObject{
         });
         gameobject.enemies.splice(0, gameobject.enemies.length);
 
-        gameobject.removeGround();
-        gameobject.removeLights();
+        gameobject.removeGround(scene);
+        gameobject.removeLights(scene);
     }
 }
