@@ -1,5 +1,7 @@
 console.log('hello world!');
 
+
+/*
 routes.forEach(route => {
     const div = document.createElement('div');
     const a = document.createElement('a')
@@ -9,3 +11,4 @@ routes.forEach(route => {
     div.appendChild(a);
     document.body.appendChild(div);
 });
+*/
