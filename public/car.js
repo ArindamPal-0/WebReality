@@ -107,7 +107,7 @@ gyroscope.onreading = () => {
 }
 
 let loader = new THREE.GLTFLoader();
-loader.load('/car.gltf', gltf => {
+loader.load('car.gltf', gltf => {
     car = gltf.scene.children[0];
     car.position.set(0, 0, 0);
     let scale = 0.5;
