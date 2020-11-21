@@ -12,6 +12,11 @@ const setFromCartesianCoords = (s, x, y, z) => {
     }
 }
 
+let gyroInput = true;
+let touchInput = false;
+let autoRotate = false;
+
+
 const setFromVector = (s, v) => {
     setFromCartesianCoords(s, v.x, v.y, v.z);
 }
@@ -22,7 +27,9 @@ camera.position.set(-6.74, 2.63, 2.93);
 camera.rotation.set(-0.62, -1.08, -0.56);
 
 const spherical = new THREE.Spherical();
+const initSpherical = new THREE.Spherical();
 setFromVector(spherical, camera.position);
+setFromVector(initSpherical, camera.position);
 
 hlight = new THREE.AmbientLight (0x404040,100);
 scene.add(hlight);
@@ -80,21 +87,23 @@ gyroscope.onreading = () => {
 
     //p.textContent = rotY;
 
-    spherical.theta += rotY;
-    spherical.phi += rotX;
+    if(gyroInput){
+        spherical.theta += rotY;
+        spherical.phi += rotX;
 
-    if(spherical.theta > Math.PI * 2){
-        spherical.theta = 0;
-    }
+        if(spherical.theta > Math.PI * 2){
+            spherical.theta = 0;
+        }
 
-    if(spherical.phi < Math.PI / 4){
-        spherical.phi = Math.PI / 4;
-    }else if(spherical.phi > Math.PI / 2){
-        spherical.phi = Math.PI / 2;
-    }
+        if(spherical.phi < Math.PI / 4){
+            spherical.phi = Math.PI / 4;
+        }else if(spherical.phi > Math.PI / 2){
+            spherical.phi = Math.PI / 2;
+        }
 
-    camera.position.setFromSpherical(spherical);
-    camera.lookAt(new THREE.Vector3());
+        camera.position.setFromSpherical(spherical);
+        camera.lookAt(new THREE.Vector3());
+    }    
 }
 
 let loader = new THREE.GLTFLoader();
@@ -110,6 +119,176 @@ loader.load('/car.gltf', gltf => {
     gyroscope.start();
 });
 
+//ui from camera.js
+const gyroButton = document.createElement('div');
+gyroButton.classList.add('btn');
+gyroButton.textContent = 'Disable Gyro Input';
+gyroInput = true;
+ui.appendChild(gyroButton);
+
+gyroButton.addEventListener('click', () => {
+    if(gyroInput){
+        gyroInput = false;
+        gyroButton.textContent = "Activate Gyro Input";
+        
+        //reset camera position
+        camera.position.setFromSpherical(initSpherical);
+        camera.lookAt(new THREE.Vector3());
+    }else if(!gyroInput){
+        if(touchInput){
+            touchInput = false;
+            touchButton.textContent = "Activate Touch Input";
+        }
+        gyroInput = true;
+        gyroButton.textContent = "Disable Gyro Input";
+    }
+});
+
+const touchButton = document.createElement('div');
+touchButton.classList.add('btn');
+touchInput = false;
+touchButton.textContent = 'Activate Touch Input';
+ui.appendChild(touchButton);
+
+touchButton.addEventListener('click', () => {
+    if(touchInput){
+        touchInput = false;
+        touchButton.textContent = "Activate Touch Input";
+    }else if(!touchInput){
+        if(gyroInput){
+            gyroInput = false;
+            gyroButton.textContent = "Activate Gyro Input";
+            //reset camera position
+            camera.position.setFromSpherical(initSpherical);
+            camera.lookAt(new THREE.Vector3());
+        }
+        touchInput = true;
+        touchButton.textContent = "Disable Touch Input";
+    }
+});
+
+const autoButton = document.createElement('div');
+autoButton.classList.add('btn');
+autoButton.textContent = 'Activate Auto Rotate';
+autoRotate = false;
+ui.appendChild(autoButton);
+
+autoButton.addEventListener('click', () => {
+    if(!autoRotate){
+        if(gyroInput){
+            gyroInput = false;
+            gyroButton.textContent = "Activate Gyro Input";
+        }
+
+        if(touchInput){
+            touchInput = false;
+            touchButton.textContent = "Activate Touch Input";
+        }
+
+        autoRotate = true;
+        autoButton.textContent = "Disable Auto Rotate"
+
+        setFromVector(spherical, camera.position);
+    }else if(autoRotate){
+        autoRotate = false;
+        autoButton.textContent = "Activate Auto Rotate";
+
+        if(!touchInput){
+            touchInput = true;
+            touchButton.textContent = "Disable Touch Input";
+        }
+    }
+    
+
+    camera.position.setFromSpherical(spherical);
+    camera.lookAt(new THREE.Vector3());
+});
+
+const resetButton = document.createElement('div');
+resetButton.classList.add('btn');
+resetButton.textContent = 'Reset Camera Position';
+ui.appendChild(resetButton);
+
+resetButton.addEventListener('click', () => {
+    if(gyroInput){
+        gyroInput = false;
+        gyroButton.textContent = 'Activate Gyro Input';
+    }
+
+    if(touchInput){
+        touchInput = false;
+        touchButton.textContent = 'Activate Touch Input';
+    }
+
+    camera.position.setFromSpherical(initSpherical);
+    camera.lookAt(new THREE.Vector3());
+});
+
+let mouseDown = false;
+
+/*
+const value = document.createElement('div');
+value.classList.add('btn');
+value.textContent = 'value';
+ui.appendChild(value);
+*/
+
+let prevPos = 0;
+
+//BUGGY TOUCH CONTROLS FIX IT
+window.addEventListener('touchstart', event => {
+    mouseDown = true;
+    prevPos = 0;
+
+    window.addEventListener('touchmove', event => {
+        if(event.touches[0].clientX != prevPos){
+            let x = event.touches[0].clientX - prevPos;
+            prevPos = event.touches[0].clientX;
+            if(touchInput){
+                setFromVector(spherical, camera.position);
+
+                spherical.theta += -(Math.PI / 1000) * x;
+
+                if(spherical.theta > Math.PI * 2){
+                    spherical.theta = 0;
+                }
+
+                camera.position.setFromSpherical(spherical);
+                camera.lookAt(new THREE.Vector3());
+            }            
+        }
+    });
+
+    window.addEventListener('touchend', event => {
+        mouseDown = false;
+    })
+});
+
+window.addEventListener('mousedown', () => {
+    if(!mouseDown)
+        mouseDown = true;
+});
+
+window.addEventListener('mouseup', () => {
+    if(mouseDown)
+        mouseDown = false;
+})
+
+window.addEventListener('mousemove', event => {
+    if(touchInput){
+        if(mouseDown){
+            spherical.theta += -(Math.PI / 1000) * event.movementX;
+
+            if(spherical.theta > Math.PI * 2){
+                spherical.theta = 0;
+            }
+
+            camera.position.setFromSpherical(spherical);
+            camera.lookAt(new THREE.Vector3());
+        }        
+    }
+})
+
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -118,5 +297,16 @@ window.addEventListener('resize', () => {
 
 const animate = () => {
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);    
+    requestAnimationFrame(animate);
+
+    if(autoRotate){
+        spherical.theta += (Math.PI / 1000);
+
+        if(spherical.theta > Math.PI * 2){
+            spherical.theta = 0;
+        }
+
+        camera.position.setFromSpherical(spherical);
+        camera.lookAt(new THREE.Vector3());
+    }
 }
